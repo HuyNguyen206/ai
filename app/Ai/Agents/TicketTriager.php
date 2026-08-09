@@ -4,11 +4,7 @@ namespace App\Ai\Agents;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Ai\Contracts\Agent;
-use Laravel\Ai\Contracts\Conversational;
 use Laravel\Ai\Contracts\HasStructuredOutput;
-use Laravel\Ai\Contracts\HasTools;
-use Laravel\Ai\Contracts\Tool;
-use Laravel\Ai\Messages\Message;
 use Laravel\Ai\Promptable;
 use Stringable;
 
@@ -21,27 +17,15 @@ class TicketTriager implements Agent, HasStructuredOutput
      */
     public function instructions(): Stringable|string
     {
-        return 'You are a helpful assistant.';
-    }
-
-    /**
-     * Get the list of messages comprising the conversation so far.
-     *
-     * @return Message[]
-     */
-    public function messages(): iterable
-    {
-        return [];
-    }
-
-    /**
-     * Get the tools available to the agent.
-     *
-     * @return Tool[]
-     */
-    public function tools(): iterable
-    {
-        return [];
+        return <<<'PROMPT'
+                You are a support ticket triage assistant. Return structured data only.
+                Do not include extra keys.';
+                RULES
+                    - always include every key in the schema.
+                    - if you cannot determine a value, use
+                        - summary: "" (empty string)
+                        - tags: []
+                PROMPT;
     }
 
     /**
@@ -50,7 +34,12 @@ class TicketTriager implements Agent, HasStructuredOutput
     public function schema(JsonSchema $schema): array
     {
         return [
-            'value' => $schema->string()->required(),
+            'priority' => $schema->integer()->min(1)->max(5)->required(),
+            'department' => $schema->string()->required(),
+            'sentiment' => $schema->string()->required(),
+            'tags' => $schema->array()->items($schema->string())
+                ->min(0)->max(6)->required(),
+            'summary' => $schema->string()->required(),
         ];
     }
 }
