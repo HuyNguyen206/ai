@@ -14,6 +14,15 @@ export default defineConfig({
     ],
     server: {
         cors: true,
+        // Bind all interfaces: vite runs in a container and the host browser reaches
+        // it through the published port, which the default loopback bind refuses.
+        host: '0.0.0.0',
+        port: 5173,
+        strictPort: true,
+        // The browser resolves HMR on the host, not inside the container.
+        hmr: {
+            host: 'localhost',
+        },
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },
