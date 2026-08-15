@@ -3,11 +3,18 @@
 namespace App\Ai\Agents;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
+use Laravel\Ai\Attributes\MaxTokens;
+use Laravel\Ai\Attributes\Provider;
+use Laravel\Ai\Attributes\UseCheapestModel;
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Contracts\HasStructuredOutput;
+use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Promptable;
 use Stringable;
 
+#[Provider(Lab::Gemini)]
+#[UseCheapestModel]
+#[MaxTokens(1200)]
 class TicketTriager implements Agent, HasStructuredOutput
 {
     use Promptable;
