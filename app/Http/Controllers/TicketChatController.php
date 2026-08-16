@@ -42,7 +42,7 @@ class TicketChatController extends Controller
                     ->prompt($prompt);
 
                 $ticket->update([
-                    'ai_conversation_id' => $response->conversationId()
+                    'ai_conversation_id' => $response->conversationId
                 ]);
             }
 
@@ -84,6 +84,11 @@ class TicketChatController extends Controller
             'body' => (string) $response,
         ]);
 
-        return redirect()->back();
+        return response()->json([
+                 'data' => (string )$response ?? null,
+                 'success' => true,
+             ]);
+
+//        return redirect()->back();
     }
 }

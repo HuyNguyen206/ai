@@ -13,6 +13,7 @@ use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Messages\Message;
+use Laravel\Ai\Messages\MessageRole;
 use Laravel\Ai\Promptable;
 use Stringable;
 
@@ -49,8 +50,15 @@ PROMPT;
      */
     public function messages(): iterable
     {
-        return TicketMessage::where('ticket_id', $this->ticketId)->latest()->get();
-    }
+        return TicketMessage::where('ticket_id', $this->ticketId)
+            ->get()
+            ->map(function (TicketMessage $message) {
+                $role = is_null($message->user_id)
+                    ? MessageRole::Assistant
+                    : MessageRole::User;
+
+                return new Message($role, $message->body);
+            })->toArray();    }
 
     public function ticketContext(): string
     {
