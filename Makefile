@@ -1,10 +1,10 @@
 .PHONY: *
 
 infra-shell-php:
-	docker compose -f ../../server/docker-compose.yml exec -u=dev -it ai bash
+	docker compose -f ../../server/docker-compose.yml exec -u=dev -it ai bash -l
 
 infra-shell-root-php:
-	docker compose -f ../../server/docker-compose.yml exec -it ai bash
+	docker compose -f ../../server/docker-compose.yml exec -it ai bash -l
 
 start:
 	docker compose -f ../../server/docker-compose.yml up -d
