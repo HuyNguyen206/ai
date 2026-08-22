@@ -58,12 +58,73 @@
         Alpine.data('ticketDraftDemo', (ticketId, initialDraft = '') => ({
             ticketId: ticketId,
             draft: initialDraft,
-            prompt: '',
             controller: null,
+            streaming: false,
+
+            // Characters received from the server but not yet painted.
+            pending: '',
+            typer: null,
+
+            // Typing pace. ~2 chars every 16ms frame = ~125 chars/sec.
+            minCharsPerFrame: 2,
+            frameMs: 16,
+
+            enqueue(text) {
+                this.pending += text;
+                this.startTyping();
+            },
+
+            startTyping() {
+                if (this.typer) {
+                    return
+                }
+
+                this.typer = setInterval(() => {
+                    if (this.pending.length === 0) {
+                        // Nothing buffered and the network is done: stop the timer.
+                        if (!this.streaming) {
+                            this.stopTyping();
+                        }
+
+                        return
+                    }
+
+                    // Drain faster when we have fallen behind, so a burst of
+                    // tokens never leaves the text trailing seconds behind.
+                    const size = Math.max(this.minCharsPerFrame, Math.ceil(this.pending.length / 20));
+
+                    this.draft += this.pending.slice(0, size);
+                    this.pending = this.pending.slice(size);
+                }, this.frameMs);
+            },
+
+            stopTyping() {
+                clearInterval(this.typer);
+                this.typer = null;
+            },
+
+            cancelStream() {
+                this.controller?.abort();
+                this.streaming = false;
+                this.pending = '';
+                this.stopTyping();
+            },
+            insertIntoReply() {
+                const replyBox = document.querySelector('[data-ticket-reply]');
+
+                replyBox.value = this.draft ;
+            },
             async streamDraft() {
+                if (this.streaming) {
+                    return
+                }
+
+                this.draft = '';
+                this.pending = '';
+                this.streaming = true;
+                this.controller = new AbortController();
+
                 try {
-                    this.draft = '';
-                    this.controller = new AbortController();
                     const response = await fetch(`/tickets/${this.ticketId}/ai/draft-reply/stream`, {
                         method: 'POST',
                         headers: {
@@ -104,7 +165,7 @@
                             try {
                                 const event = JSON.parse(payload);
                                 if (event.type === 'text_delta') {
-                                    this.draft += event.delta;
+                                    this.enqueue(event.delta);
                                 }
                             } catch (error) {
                                 console.error('Error parsing SSE event:', error);
@@ -112,16 +173,13 @@
                         })
                     }
                 } catch (error) {
-                    console.error('Error saving draft:', error);
+                    if (error.name !== 'AbortError') {
+                        console.error('Error streaming draft:', error);
+                    }
+                } finally {
+                    // Let the typer drain whatever is still buffered, then stop.
+                    this.streaming = false;
                 }
-            },
-            cancelStream() {
-                this.controller?.abort();
-            },
-            insertIntoReply() {
-                const replyBox = document.querySelector('[data-ticket-reply]');
-
-                replyBox.value = this.draft ;
             }
         }))
     });

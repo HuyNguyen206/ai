@@ -28,7 +28,7 @@ class TicketDraftReplyStreamController extends Controller
             'status' => 'running',
             'provider' => config('ai.default'),
             'model' => null,
-            'input_hash' => sha1($ticket->id . '|' . $request->string('message')),
+            'input_hash' => sha1($ticket->id.'|'.$request->string('message')),
         ]);
 
         $stream = $agent->stream($prompt);
@@ -39,7 +39,7 @@ class TicketDraftReplyStreamController extends Controller
                 'finished_at' => now(),
                 'output_text' => $response->text,
                 'provider' => $response->meta->provider,
-                'model' => $response->meta->model ,
+                'model' => $response->meta->model,
             ]);
 
             if (isset($response->usage)) {
@@ -53,6 +53,26 @@ class TicketDraftReplyStreamController extends Controller
             }
         });
 
-        return $stream;
+        return response()->stream(function () use ($stream) {
+            // Drop any PHP output buffers so each event leaves the process immediately.
+            while (ob_get_level() > 0) {
+                ob_end_flush();
+            }
+
+            foreach ($stream as $event) {
+                echo 'data: '.((string) $event)."\n\n";
+
+                flush();
+            }
+
+            echo "data: [DONE]\n\n";
+
+            flush();
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache, no-store',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no',
+        ]);
     }
 }
