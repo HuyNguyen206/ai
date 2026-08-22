@@ -58,7 +58,8 @@ PROMPT;
                     : MessageRole::User;
 
                 return new Message($role, $message->body);
-            })->toArray();    }
+            })->toArray();
+    }
 
     public function ticketContext(): string
     {

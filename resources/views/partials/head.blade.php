@@ -54,5 +54,75 @@
 
             }
         }))
+
+        Alpine.data('ticketDraftDemo', (ticketId, initialDraft = '') => ({
+            ticketId: ticketId,
+            draft: initialDraft,
+            prompt: '',
+            controller: null,
+            async streamDraft() {
+                try {
+                    this.draft = '';
+                    this.controller = new AbortController();
+                    const response = await fetch(`/tickets/${this.ticketId}/ai/draft-reply/stream`, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'text/event-stream',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        signal: this.controller.signal
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to stream draft reply');
+                    }
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buffer = '';
+
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+
+                        buffer += decoder.decode(value, { stream: true });
+
+                        const parts = buffer.split('\n\n');
+
+                        buffer = parts.pop() ?? '';
+
+                        parts.forEach(part => {
+                            if (!part.startsWith('data: ')) {
+                                return
+                            }
+
+                            const payload = part.replace('data: ', '').trim();
+                            if (payload === '[DONE]') {
+                                return
+                            }
+
+                            try {
+                                const event = JSON.parse(payload);
+                                if (event.type === 'text_delta') {
+                                    this.draft += event.delta;
+                                }
+                            } catch (error) {
+                                console.error('Error parsing SSE event:', error);
+                            }
+                        })
+                    }
+                } catch (error) {
+                    console.error('Error saving draft:', error);
+                }
+            },
+            cancelStream() {
+                this.controller?.abort();
+            },
+            insertIntoReply() {
+                const replyBox = document.querySelector('[data-ticket-reply]');
+
+                replyBox.value = this.draft ;
+            }
+        }))
     });
 </script>
