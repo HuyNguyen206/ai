@@ -16,7 +16,7 @@ class TicketDraftReplyStreamController extends Controller
      */
     public function __invoke(Request $request, Ticket $ticket)
     {
-        $agent = new TicketAssistant($ticket->id);
+        $agent = new TicketAssistant($ticket->id, $request->user()->id);
         $prompt = 'Draft a concise, friendly reply to the most recent user message';
 
         $run = AiRun::create([

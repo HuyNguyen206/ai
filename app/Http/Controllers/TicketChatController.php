@@ -19,7 +19,7 @@ class TicketChatController extends Controller
             'message' => 'required|string|max:2000'
         ]);
 
-        $agent = new TicketAssistant($ticket->id);
+        $agent = new TicketAssistant($ticket->id, $request->user()->id);
         $prompt = "\n\nUser message:\n" . $request->string('message');
 
         $aiRun = AiRun::create([
