@@ -25,6 +25,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('tickets/{ticket}/ai/draft-reply/stream', TicketDraftReplyStreamController::class)
         ->name('tickets.ai.draft-reply.stream');
+
+    Route::get('documents/search', \App\Http\Controllers\AiKnowledgeSearchController::class)
+        ->name('ai.knowledge-search');
 });
 
 
