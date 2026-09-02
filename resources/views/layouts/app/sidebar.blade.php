@@ -18,9 +18,13 @@
                     <flux:sidebar.item icon="layout-grid" :href="route('tickets.index')" :current="request()->routeIs('tickets.*')" wire:navigate>
                         {{ __('Tickets') }}
                     </flux:sidebar.item>
-                    <flux:sidebar.item icon="layout-grid" :href="route('ai.knowledge-search')" :current="request()->routeIs('ai.knowledge-search')"
+                    <flux:sidebar.item icon="sparkles" :href="route('ai.knowledge-search')" :current="request()->routeIs('ai.knowledge-search')"
                                        wire:navigate>
                         {{ __('AI Search') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="document-text" :href="route('ai.document-qa')" :current="request()->routeIs('ai.document-qa')"
+                                       wire:navigate>
+                        {{ __('Document QA') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
