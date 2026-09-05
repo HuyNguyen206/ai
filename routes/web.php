@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AiDocumentQAController;
 use App\Http\Controllers\AiProductDescriptionController;
+use App\Http\Controllers\CreativeAssistantController;
 use App\Http\Controllers\TicketChatController;
 use App\Http\Controllers\TicketDraftReplyStreamController;
 use App\Http\Controllers\TicketTriagerController;
@@ -44,6 +45,11 @@ Route::middleware(['auth', 'ai.budget'])->group(function () {
         ->name('ai.product-description');
     Route::post('ai/product-description', [AiProductDescriptionController::class, 'store'])
         ->name('ai.product-description.store');
+
+    Route::get('ai/creative-assistant', [CreativeAssistantController::class, 'index'])
+        ->name('ai.creative-assistant');
+    Route::post('ai/creative-assistant', [CreativeAssistantController::class, 'store'])
+        ->name('ai.creative-assistant.store');
 });
 
 

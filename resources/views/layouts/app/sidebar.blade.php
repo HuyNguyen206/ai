@@ -30,6 +30,9 @@
                                        wire:navigate>
                         {{ __('Product Description') }}
                     </flux:sidebar.item>
+                    <flux:sidebar.item icon="megaphone" :href="route('ai.creative-assistant')" :current="request()->routeIs('ai.creative-assistant')" wire:navigate>
+                        {{ __('AI assistant creative') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
