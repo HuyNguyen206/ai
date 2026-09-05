@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('ai_usages', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\AiRun::class)->nullable()
-                ->constrained()->cascadeOnDelete();
             $table->unsignedInteger('prompt_tokens')->default(0);
             $table->unsignedInteger('completion_tokens')->default(0);
             $table->unsignedInteger('total_tokens')->default(0);
             $table->decimal('cost_usd', 10, 4)->nullable();
+            $table->string('invocation_id')->nullable()->index();
             $table->timestamps();
         });
     }

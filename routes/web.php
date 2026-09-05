@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AiDocumentQAController;
+use App\Http\Controllers\AiProductDescriptionController;
 use App\Http\Controllers\TicketChatController;
 use App\Http\Controllers\TicketDraftReplyStreamController;
 use App\Http\Controllers\TicketTriagerController;
@@ -14,7 +15,7 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'ai.budget'])->group(function () {
     Route::livewire('tickets', 'pages::tickets.index')->name('tickets.index');
     Route::livewire('tickets/{ticket}', 'pages::tickets.show')->name('tickets.show');
 
@@ -38,6 +39,11 @@ Route::middleware(['auth'])->group(function () {
         ->name('ai.document-qa.ask');
     Route::delete('ai/document-qa/{uploadedDocument}', [AiDocumentQaController::class, 'destroy'])
         ->name('ai.document-qa.delete');
+
+    Route::get('ai/product-description', [AiProductDescriptionController::class, 'index'])
+        ->name('ai.product-description');
+    Route::post('ai/product-description', [AiProductDescriptionController::class, 'store'])
+        ->name('ai.product-description.store');
 });
 
 

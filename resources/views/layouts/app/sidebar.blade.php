@@ -26,6 +26,10 @@
                                        wire:navigate>
                         {{ __('Document QA') }}
                     </flux:sidebar.item>
+                    <flux:sidebar.item icon="megaphone" :href="route('ai.product-description')" :current="request()->routeIs('ai.product-description')"
+                                       wire:navigate>
+                        {{ __('Product Description') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

@@ -140,4 +140,6 @@ return [
         ],
     ],
 
+    'daily_team_token_budget' => env('DAILY_TEAM_TOKEN_BUDGET', 50000), // default to 1000 tokens per team per day
+
 ];

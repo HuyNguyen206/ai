@@ -49,17 +49,8 @@ class TicketTriagerController extends Controller
             $aiRun->update([
                 'status' => 'success',
                 'finished_at' => now(),
+                'invocation_id' => $response->invocationId
             ]);
-
-            if (isset($response->usage)) {
-                AiUsage::create([
-                    'ai_run_id' => $aiRun->id,
-                    'prompt_tokens' => $response->usage->promptTokens ?? 0,
-                    'completion_tokens' => $response->usage->completionTokens ?? 0,
-                    'total_tokens' => $response->usage->totalTokens ?? 0,
-                    'cost_usd' => $response->usage->costUsd ?? null,
-                ]);
-            }
 
             return back();
         }

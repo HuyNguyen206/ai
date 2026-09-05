@@ -1,0 +1,9 @@
+# Bun-compiled CLIs (e.g. plannotator) auto-load .env from their working
+# directory. That leaked ANTHROPIC_API_KEY into their Claude auth, which
+# took precedence over the claude.ai login and billed an API account with
+# no credit ("Credit balance is too low" / "connectors are disabled").
+#
+# This project has no Bun tooling of its own (npm + package-lock.json), so
+# disabling the autoload here is safe. Laravel reads .env via PHP dotenv
+# and is unaffected.
+env = false

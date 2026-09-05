@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('input_hash')->nullable();
             $table->timestamp('started_at');
             $table->timestamp('finished_at')->nullable();
+            $table->string('invocation_id')->nullable()->index();
             $table->text('error_message')->nullable();
             $table->timestamps();
         });
