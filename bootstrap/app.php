@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'ai.budget' => \App\Http\Middleware\EnforceAiBudget::class,
         ]);
+
+        $middleware->validateCsrfTokens([
+            '/mcp'
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
